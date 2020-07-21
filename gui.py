@@ -45,10 +45,15 @@ class Grid:
         self.selected = None
 
     # when we delete/backspace
-    def clear(self):
+    def clear(self, win):
         row, col = self.selected
+        x = top_left_x + (self.cubes[row][col].col * box_size)
+        y = top_left_y + (self.cubes[row][col].row * box_size)
         if self.cubes[row][col].value == 0:
-            print("Value is 0. We are backspacing!")
+            text = font5.render(str("  "), 1,
+                                (255, 255, 255), (255, 255, 255))
+            win.blit(text, (int(x+5), int(y+5)))
+            # print("Value is 0. We are backspacing!")
             self.cubes[row][col].temp = 0
 
     # get position of element in board (row, column)
@@ -77,19 +82,25 @@ class Grid:
             self.cols)] for i in range(self.rows)]
 
     # takes user entered value and check if it's the right number
-    def place(self, val):
+    def place(self, val, win):
         row, col = self.selected
+        x = top_left_x + (self.cubes[row][col].col * box_size)
+        y = top_left_y + (self.cubes[row][col].row * box_size)
         # only if it's already empty
         if self.cubes[row][col].value == 0:
             self.cubes[row][col].set(val)
             self.update_model()
 
             if valid(self.model, val, self.selected) and solve(self.model):
+                self.cubes[row][col].set_temp(val)
                 return True
             else:
                 self.cubes[row][col].set(0)
                 self.cubes[row][col].set_temp(0)
                 self.update_model()
+                text = font5.render(str("  "), 1,
+                                    (255, 255, 255), (255, 255, 255))
+                win.blit(text, (int(x+5), int(y+5)))
                 return False
 
     def is_finished(self):
@@ -149,6 +160,9 @@ class Cube:
                                 (128, 128, 128), (255, 255, 255))
             win.blit(text, (int(x+5), int(y+5)))
         elif not(self.value == 0):
+            text = font5.render(str("  "), 1,
+                                (255, 255, 255), (255, 255, 255))
+            win.blit(text, (int(x+5), int(y+5)))
             text = font5.render(str(self.value), 1, (0, 0, 0), (255, 255, 255))
             win.blit(text, (int(x + (box_size/2 - text.get_width()/2)),
                             int(y + (box_size/2 - text.get_height()/2))))
@@ -172,8 +186,8 @@ def main():
     pygame.display.set_caption("Sudoku")
 
     label = font1.render("SUDOKU", 1, white)
-    warn = font2.render("(15 chances / block)", 1, grey, blue)
-    time_show = font2.render(" Press 'M' to mute ", 1, black, white)
+    warn = font2.render("( Max no. of chances : 15 )", 1, grey, blue)
+    time_show = font2.render(" ' M ' to mute ", 1, black, white)
 
     win.blit(BG, (0, 0))
     win.blit(label, (int(top_left_x + play_width/2 - (label.get_width()/2)), 20))
@@ -222,16 +236,16 @@ def main():
                 if event.key == pygame.K_9:
                     key = 9
                 if event.key == pygame.K_DELETE or event.key == pygame.K_BACKSPACE:
-                    board.clear()
+                    board.clear(win)
                     key = None
                 if event.key == pygame.K_RETURN:
                     i, j = board.selected
                     if board.cubes[i][j].temp != 0:
-                        if not board.place(board.cubes[i][j].temp):
+                        if not board.place(board.cubes[i][j].temp, win):
                             strikes += 1
                             board.cubes[i][j].set_temp(0)
                         key = None
-                    if board.is_finished():
+                    if board.is_finished() or strikes > 15:
                         font4 = pygame.font.SysFont("comicsans", 70)
                         text = font4.render("GAME OVER !", 1, grey)
                         win.blit(text, (int(s_width/2 - (text.get_width()/2)),
@@ -281,5 +295,5 @@ def redraw_window(win, board, time, strikes, width, height):
 
 
 main()
-sleep(1)
+sleep(5)
 pygame.quit()

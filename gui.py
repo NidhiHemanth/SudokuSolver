@@ -48,24 +48,29 @@ class Grid:
     def clear(self):
         row, col = self.selected
         if self.cubes[row][col].value == 0:
-            self.cubes[row][col].set_temp(0)
+            print("Value is 0. We are backspacing!")
+            self.cubes[row][col].temp = 0
 
     # get position of element in board (row, column)
     def click(self, pos):
-        if (pos[0] > 29 and pos[0] < 524) and (pos[1] > 110 and pos[1] < 705):
+        if (pos[0] > 28 and pos[0] < 524) and (pos[1] > 110 and pos[1] < 608):
             x = (pos[0] - 29)//box_size
             y = (pos[1] - 110)//box_size
+            # print(int(y), int(x))
             return (int(y), int(x))
-        else:
-            return None
+        # print(pos)
+        return None
 
     # assigns selected True for the box selected, False for everything else
     def select(self, row, col):
-        for i in range(self.rows):
-            for j in range(self.cols):
-                self.cubes[i][j].selected = False
-        self.cubes[row][col].selected = True
-        self.selected = (row, col)
+        if ((row < 0 and row > 8) and (col < 0 and col > 8)):
+            pass
+        else:
+            for i in range(self.rows):
+                for j in range(self.cols):
+                    self.cubes[i][j].selected = False
+            self.cubes[row][col].selected = True
+            self.selected = (row, col)
 
     def update_model(self):
         self.model = [[self.cubes[i][j].value for j in range(
@@ -139,6 +144,7 @@ class Cube:
         x = top_left_x + (self.col * box_size)
         y = top_left_y + (self.row * box_size)
         if self.temp != 0 and self.value == 0:
+            # print(self.temp)
             text = font5.render(str(self.temp), 1,
                                 (128, 128, 128), (255, 255, 255))
             win.blit(text, (int(x+5), int(y+5)))
@@ -148,6 +154,8 @@ class Cube:
                             int(y + (box_size/2 - text.get_height()/2))))
 
         if self.selected:
+            pygame.draw.rect(win, (255, 255, 255),
+                             (x, y, box_size, box_size), 3)
             pygame.draw.rect(win, (255, 0, 0), (x, y, box_size, box_size), 3)
 
 # =================================
@@ -221,6 +229,7 @@ def main():
                     if board.cubes[i][j].temp != 0:
                         if not board.place(board.cubes[i][j].temp):
                             strikes += 1
+                            board.cubes[i][j].set_temp(0)
                         key = None
                     if board.is_finished():
                         font4 = pygame.font.SysFont("comicsans", 70)

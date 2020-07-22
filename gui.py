@@ -22,6 +22,10 @@ top_left_y = 110
 
 BG = pygame.transform.scale(pygame.image.load(
     "images/bg.gif"), (s_width, s_height))
+#chances = pygame.transform.scale(pygame.image.load("images/chances.PNG"), (170, 35))
+#mute = pygame.transform.scale(pygame.image.load("images/mute.PNG"), (140, 30))
+solve = pygame.transform.scale(
+    pygame.image.load("images/solve.PNG"), (180, 30))
 
 font1 = pygame.font.SysFont("comicsans", 60)
 font2 = pygame.font.SysFont("comicsans", 25)
@@ -195,20 +199,21 @@ def main():
     icon = pygame.image.load("images/icon.png")
     pygame.display.set_icon(icon)
 
-    # pygame.mixer.music.load("bg_music.mp3")
-    # pygame.mixer.music.play(-1)
+    pygame.mixer.music.load("bg_music.mp3")
+    pygame.mixer.music.play(-1)
 
     win = pygame.display.set_mode((s_width, s_height))
     pygame.display.set_caption("Sudoku")
 
     label = font1.render("SUDOKU", 1, white)
-    warn = font2.render("( Max no. of chances : 15 )", 1, grey, blue)
-    time_show = font2.render(" ' M ' to mute ", 1, black, white)
+    warn = font2.render(" Max chances : 15 ", 1, black, grey)
+    time_show = font2.render(" ' M ' to mute  ", 1, black, grey)
 
     win.blit(BG, (0, 0))
     win.blit(label, (int(top_left_x + play_width/2 - (label.get_width()/2)), 20))
-    win.blit(warn, (int(s_width - warn.get_width() - 15), 75))
-    win.blit(time_show, (int(s_width - time_show.get_width() - 15), 50))
+    win.blit(warn, (int(s_width - warn.get_width() - 15), 80))
+    win.blit(time_show, (int(s_width - time_show.get_width() - 15), 55))
+    win.blit(solve, (20, 70))
 
     win.fill((250, 250, 250), ((top_left_x, top_left_y),
                                (play_width, play_height)))
@@ -221,6 +226,7 @@ def main():
     start = time.time()
     strikes = 0
     board = Grid(play_width, play_height)
+    m_count = 0
 
     run = True
     while run:
@@ -232,7 +238,11 @@ def main():
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_m:
-                    pygame.mixer.music.pause()
+                    m_count += 1
+                    if m_count % 2 != 0:
+                        pygame.mixer.music.pause()
+                    else:
+                        pygame.mixer.music.play(-1)
                 if event.key == pygame.K_1:
                     key = 1
                 if event.key == pygame.K_2:
@@ -266,6 +276,7 @@ def main():
                         text = font4.render("GAME OVER !", 1, grey)
                         win.blit(text, (int(s_width/2 - (text.get_width()/2)),
                                         int(s_height/2 - (text.get_height()/2))))
+                        sleep(5)
                         run = False
 
             # when mouse pressed, Grid selected stores (i,j) Cube selected = True
@@ -311,5 +322,5 @@ def redraw_window(win, board, time, strikes, width, height):
 
 
 main()
-sleep(5)
+sleep(0)
 pygame.quit()

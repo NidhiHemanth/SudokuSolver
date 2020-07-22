@@ -23,12 +23,8 @@ pip install pygame
 
 1. Open '_main.py_'
 2. Replace the list variable '_board_' with the sudoku board you want to be solve
-<<<<<<< HEAD
 3. Uncomment 'print_board(board)'
-4. Run the file
-=======
-3. Run the file\
->>>>>>> 58a05b6c4fcc3f78773cb05fa82988f0f44d27e4
+4. Run the file\
    A solved sudoku board is printed in the Terminal !
 
 ○○ <ins>Using the GUI to play the game</ins> ○○

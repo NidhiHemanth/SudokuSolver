@@ -22,10 +22,11 @@ top_left_y = 110
 
 BG = pygame.transform.scale(pygame.image.load(
     "images/bg.gif"), (s_width, s_height))
-#chances = pygame.transform.scale(pygame.image.load("images/chances.PNG"), (170, 35))
-#mute = pygame.transform.scale(pygame.image.load("images/mute.PNG"), (140, 30))
-solve = pygame.transform.scale(
-    pygame.image.load("images/solve.PNG"), (180, 30))
+# chances = pygame.transform.scale(pygame.image.load("images/chances.PNG"), (170, 35))
+# mute = pygame.transform.scale(pygame.image.load("images/mute.PNG"), (140, 30))
+# solve = pygame.transform.scale(pygame.image.load("images/solve.PNG"), (180, 30))
+GameOver = pygame.transform.scale(
+    pygame.image.load("images/gameover.PNG"), (475, 270))
 
 font1 = pygame.font.SysFont("comicsans", 60)
 font2 = pygame.font.SysFont("comicsans", 25)
@@ -97,17 +98,23 @@ class Grid:
             self.cubes[row][col].set(val)
             self.update_model()
 
-            if valid(self.model, val, self.selected) and solve(self.model):
+            try:
+                if valid(self.model, val, self.selected) and solve(self.model):
+                    self.cubes[row][col].set_temp(val)
+                    return True
+
+                else:
+                    self.cubes[row][col].set(0)
+                    self.cubes[row][col].set_temp(0)
+                    self.update_model()
+                    text = font5.render(str("  "), 1,
+                                        (255, 255, 255), (255, 255, 255))
+                    win.blit(text, (int(x+5), int(y+5)))
+                    return False
+
+            except TypeError:
                 self.cubes[row][col].set_temp(val)
                 return True
-            else:
-                self.cubes[row][col].set(0)
-                self.cubes[row][col].set_temp(0)
-                self.update_model()
-                text = font5.render(str("  "), 1,
-                                    (255, 255, 255), (255, 255, 255))
-                win.blit(text, (int(x+5), int(y+5)))
-                return False
 
     def is_finished(self):
         for i in range(self.rows):
@@ -120,10 +127,17 @@ class Grid:
         row, col = self.selected
         self.cubes[row][col].set_temp(val)
 
+    def clear_redbox(self, win):
+        for i in range(9):
+            for j in range(self.cols):
+                self.cubes[i][j].need_redbox(win)
+
     def draw(self, win):
+        self.clear_redbox(win)
+
         for i in range(9):
             if i % 3 == 0 and i != 0:
-                thick = 4
+                thick = 3
             else:
                 thick = 1
             pygame.draw.line(win, black, (int(top_left_x), int((i * box_size) + top_left_y)),
@@ -172,6 +186,12 @@ class Cube:
     def set_temp(self, val):
         self.temp = val
 
+    def need_redbox(self, win):
+        x = top_left_x + (self.col * box_size)
+        y = top_left_y + (self.row * box_size)
+        pygame.draw.rect(win, (255, 255, 255),
+                         (x, y, box_size, box_size), 3)
+
     def draw(self, win):
         x = top_left_x + (self.col * box_size)
         y = top_left_y + (self.row * box_size)
@@ -190,7 +210,8 @@ class Cube:
 
         if self.selected:
             # pygame.draw.rect(win, (255, 255, 255),(x, y, box_size, box_size), 3)
-            pygame.draw.rect(win, (255, 0, 0), (x, y, box_size, box_size), 3)
+            pygame.draw.rect(win, (255, 0, 0),
+                             (x, y, box_size, box_size), 3)
 
 # =================================
 
@@ -213,7 +234,7 @@ def main():
     win.blit(label, (int(top_left_x + play_width/2 - (label.get_width()/2)), 20))
     win.blit(warn, (int(s_width - warn.get_width() - 15), 80))
     win.blit(time_show, (int(s_width - time_show.get_width() - 15), 55))
-    win.blit(solve, (20, 70))
+    # win.blit(solve, (20, 70))
 
     win.fill((250, 250, 250), ((top_left_x, top_left_y),
                                (play_width, play_height)))
@@ -271,12 +292,8 @@ def main():
                             strikes += 1
                             board.cubes[i][j].set_temp(0)
                         key = None
-                    if board.is_finished() or strikes > 15:
-                        font4 = pygame.font.SysFont("comicsans", 70)
-                        text = font4.render("GAME OVER !", 1, grey)
-                        win.blit(text, (int(s_width/2 - (text.get_width()/2)),
-                                        int(s_height/2 - (text.get_height()/2))))
-                        sleep(5)
+                    if board.is_finished() or strikes >= 15:
+                        sleep(1)
                         run = False
 
             # when mouse pressed, Grid selected stores (i,j) Cube selected = True
@@ -295,6 +312,12 @@ def main():
 
         redraw_window(win, board, play_time, strikes, s_width, s_height)
         pygame.display.update()
+
+    win.blit(GameOver, (int(s_height/2 - (475/2) - 50),
+                        int(s_width/2 - (270/2) + 40)))
+    pygame.display.update()
+    pygame.mixer.music.pause()
+    sleep(3)
 
 # ============================
 
@@ -322,5 +345,6 @@ def redraw_window(win, board, time, strikes, width, height):
 
 
 main()
-sleep(0)
-pygame.quit()
+# print("done")
+# sleep(5)
+# pygame.quit()

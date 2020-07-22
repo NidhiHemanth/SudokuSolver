@@ -103,3 +103,4 @@ def solve(bo):
 solve(board)
 sleep(5)
 screen_clear()
+print_board(board)

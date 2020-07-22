@@ -1,6 +1,6 @@
 # Sudoku Solver
 
-Automated sudoku solver using BackTracking algorithm.
+Automated sudoku solver using BackTracking algorithm.\
 GUI in the form of a game made using PyGame.
 
 ## Snapshots
@@ -19,14 +19,14 @@ pip install pygame
 
 ## Usage
 
-○ Using the Solver ○
+- ○ Using the Solver ○ -
 
 1. Open '_main.py_'
 2. Replace the list variable '_board_' with the sudoku board you want to be solve
-3. Run the file
+3. Run the file\
    A solved sudoku board is printed in the Terminal !
 
-○ Using the GUI to play the game ○
+- ○ Using the GUI to play the game ○ -
 
 1. Open and run '_gui.py_'
 2. Enjoy playing the game!

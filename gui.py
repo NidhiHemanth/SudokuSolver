@@ -43,6 +43,8 @@ class Grid:
         self.height = height
         self.model = None
         self.selected = None
+        self.board2 = self.board.copy()
+        self.permanent = list(enumerate(self.board2))
 
     # when we delete/backspace
     def clear(self, win):
@@ -129,6 +131,21 @@ class Grid:
             for j in range(self.cols):
                 self.cubes[i][j].draw(win)
 
+        for posi in self.permanent:
+            for j in range(len(posi[1])):
+                y = posi[0]*box_size + top_left_y
+                x = j*box_size + top_left_x
+                if posi[1][j] != 0:
+                    pygame.draw.rect(win, (232, 227, 227),
+                                     (x+2, y+2, box_size-3, box_size-3))
+                    text = font5.render(str("  "), 1,
+                                        (232, 227, 227), (232, 227, 227))
+                    win.blit(text, (int(x+5), int(y+5)))
+                    text = font5.render(
+                        str(posi[1][j]), 1, (0, 0, 0), (232, 227, 227))
+                    win.blit(text, (int(x + (box_size/2 - text.get_width()/2)),
+                                    int(y + (box_size/2 - text.get_height()/2))))
+
 # =================================
 
 
@@ -168,8 +185,7 @@ class Cube:
                             int(y + (box_size/2 - text.get_height()/2))))
 
         if self.selected:
-            pygame.draw.rect(win, (255, 255, 255),
-                             (x, y, box_size, box_size), 3)
+            # pygame.draw.rect(win, (255, 255, 255),(x, y, box_size, box_size), 3)
             pygame.draw.rect(win, (255, 0, 0), (x, y, box_size, box_size), 3)
 
 # =================================
